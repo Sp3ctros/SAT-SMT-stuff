@@ -1,15 +1,14 @@
 from cvc5.pythonic import *
 
-U = DeclareSort('A')
+U = DeclareSort("U") #cria um sort
+b = Const("b", BoolSort()) #cria uma constante booleana B
+x, y, z, w = Consts("x y z w", U) #cria constanets pertencentes a U
 
-x, y, z, w = Ints('x y z w')
-b = Bool('b')  #
+s = SolverFor('QF_UF') #cria uma logica do tipo QF_UF
+s.add(x == (If(b, y, z))) #assertion
+s.add(Or((w == y), (w == z)))#assertion
+s.add(x != w)#assertion
 
-s = SolverFor('QF_UF')
-
-# Adicionando as restrições  
-s.add(Or(And(x == y, b), And(x == z, Not(b))))
-s.add(Or(w == y, w == z))  # s
-s.add(Distinct(x, w))  # Negação de x == w
-
-print(s.check())
+if s.check() == sat:  
+    m = s.model()
+    print("\n".join([str(k) + " : " + str(m[k]) for k in m]))
